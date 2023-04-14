@@ -1,0 +1,183 @@
+#! /bin/bash
+
+#Search function
+search(){
+        chests=$(find . -maxdepth 1 -type f -name "*.chest" | wc -l)
+        monster=$(find . -maxdepth 1 -type f -name "*.monster" | wc -l)
+        doors=$(find . -maxdepth 1 -type d | wc -l)
+
+        if (( chests == 1 ))
+        then
+                echo "There is one chest in this room" > /dev/tty
+        elif (( chests > 1))
+        then
+                echo "There are $chests chests in this room" > /dev/tty
+        fi
+
+        if (( monster == 1 ))
+        then
+                echo "There is one monster in the room" > /dev/tty
+        elif (( monster > 1))
+        then
+                echo "There are $monster monsters in the room" > /dev/tty
+        else
+                echo "There are no monsters in the room, you may leave" > /dev/tty
+        fi
+
+        if (( doors == 2 ))
+        then
+                echo "There is one door in this room" > /dev/tty
+	elif (( doors > 2 ))
+        then
+                echo "There are $((doors-1)) doors in this room" > /dev/tty
+        else
+                echo "There are no doors leading further, you must turn back" > /dev/tty
+        fi
+}
+
+#fight function
+fight(){
+        echo "check"
+}
+
+#Loot function
+loot(){
+        echo "check"
+}
+
+#Enter door
+enter(){
+        echo "check"
+}
+
+#Leave current Room
+leave(){
+        echo "check"
+}
+
+
+gold=0
+playerHealth=500
+playerDamage=10
+start=""
+
+# Set up directory and load in monsters/chests
+
+mkdir gameRPG
+cd gameRPG
+start=$(pwd)
+
+num1=$( expr $((RANDOM)) % 5 )
+for (( i=1;i<=num1;i++ ))
+do
+        touch "chest$i.chest"
+        chestgold=$( expr $((RANDOM)) % 5000 + 1)
+        echo $chestgold >> "chest$i.chest"
+done
+
+num1=$( expr $((RANDOM)) % 5 )
+for (( i=1;i<=num1;i++ ))
+do
+        touch "monster$i.monster"
+        attack=$( expr $((RANDOM)) % 7 + 7 )
+        health=$( expr $( expr $((RANDOM)) % 10 + 1 ) \* 10 )
+        echo $attack >> "monster$i.monster"
+        echo $health >> "monster$i.monster"
+done
+
+num1=$( expr $((RANDOM)) % 6 + 1 )
+for (( i=1;i<=num1;i++ ))
+do
+        mkdir "door$i"
+        cd "door$i"
+
+        num2=$( expr $((RANDOM)) % 5 )
+        for (( j=1;j<=num2;j++ ))
+	do
+                touch "chest$j.chest"
+                chestgold=$( expr $((RANDOM)) % 5000 + 1 )
+                echo $chestgold >> "chest$j.chest"
+        done
+
+        num2=$( expr $((RANDOM)) % 5 )
+        for (( j=1;j<=num2;j++ ))
+        do
+                touch "monster$j.monster"
+                attack=$( expr $((RANDOM)) % 7 + 7 )
+                health=$( expr $( expr $((RANDOM)) % 10 + 1 ) \* 10 )
+                echo $attack >> "monster$j.monster"
+                echo $health >> "monster$j.monster"
+        done
+
+        num2=$( expr $((RANDOM)) % 5 )
+        for (( j=1;j<=num2;j++ ))
+        do
+                mkdir "door$j"
+                cd "door$j"
+
+                num3=$( expr $((RANDOM)) % 5 )
+                for (( k=1;k<=num3;k++ ))
+		do
+                        touch "chest$k.chest"
+                        chestgold=$( expr $((RANDOM)) % 5000 + 1 )
+                        echo $chestgold >> "chest$k.chest"
+                done
+
+                num3=$( expr $((RANDOM)) % 5 )
+                for (( k=1;k<=num3;k++ ))
+                do
+                        touch "monster$k.monster"
+                        attack=$( expr $((RANDOM)) % 7 + 7 )
+                        health=$( expr $( expr $((RANDOM)) % 10 + 1 ) \* 10 )
+                        echo $attack >> "monster$k.monster"
+                        echo $health >> "monster$k.monster"
+                done
+
+                cd ..
+        done
+
+        cd ..
+done
+
+
+# Game loop
+
+
+while [ true ]
+do
+	echo "Player health: $playerHealth || Player damage: $playerDamage || Gold: $gold"
+        echo "You are in a dark and spooky dungeon, what do you do next?"
+        echo "Will you 'search' around the room, 'fight' a monster, 'loot' a chest, 'enter' a door or 'leave' your current room"
+        read -p "Choice: " ch
+
+        if [ $ch == "search" ]
+then
+                search
+        elif [ $ch == "fight" ]
+        then
+                var1=fight
+                if (( var1 == 1 ))
+                then
+                        break
+                fi
+        elif [ $ch == "loot" ]
+        then
+                loot
+        elif [ $ch == "enter" ]
+        then
+                enter
+        elif [ $ch == "leave" ]
+        then
+                var1=leave
+                if (( var1 == 1 ))
+                then
+                        break
+                fi
+        else
+                echo "Invalid Option"
+        fi
+done
+
+cd $start
+cd ..
+rmdir gameRPG
